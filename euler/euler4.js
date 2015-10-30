@@ -18,16 +18,26 @@ The approach where I (1) Find the palendromes and (2) Check for factors involves
 
  Trying that first. We need two classes of functions:
 */
-var stringsOfNums = {
-  makeArray: function(start, end) {
-    arrayOfN = [];
+var arrays = {
+  makeStringArray: function(start, end) {
+    var stringArray = [];
     for (var i=start; i <= end; i++) {
-      arrayOfN.push(String(i));
+      stringArray.push(String(i));
     };
-    return arrayOfN;
+    return stringArray;
+  },
+  convertNumber: function(array) {
+    var stringToNumArray = [];
+    for (p=0; p<array.length; p++) {
+      stringToNumArray.push(Number(array[p]));
+    }
+    return stringToNumArray;
   }
 }
-//We're gonna assume the largest product is a six-digit number (i.e. > 333*333). Otherwise we'd need to do this for five-digit numbers as well.
+//First, call the make string array. For simplicity's sake, gonna assume the largest product is a six-digit number (i.e. > 333*333), though the code could also work for a start of 10,000 (i.e. 100*100).
+var myArrayOfStrings = arrays.makeStringArray(100000,1000000);
+
+
 var palindromes = {
   findPalindromes: function(array) {
     palindromesArray = [];
@@ -45,9 +55,41 @@ var palindromes = {
   }
 }
 // Now call
-var myPalindromes = palindromes.findPalindromes(arrayOfN);
-// Can see we're down to 900 terms. In descending order, let's check for three-digit factors.
+var myPalindromeStrings = palindromes.findPalindromes(myArrayOfStrings);
+// Time for a check. If you look at the value of myPalindromeStrings, you can see we're down to 900 terms. We need to convert those back to numbers.
+
+var myPalindromeNumbers = arrays.convertNumber(myPalindromeStrings);
+
+//Awesome! Now, I'll write a function that checks for a three-digit factor of a number, and checks whether the complement factor is also three digits.
 
 var factors = {
-
+  largestThreeDigitFactor: function(number) {
+    var value=0;
+    for(j=100; j<1000; j++) {
+      if(number % j === 0) {
+        //now check whether the other factor is three digits:
+        if(number/j < 1000) {
+          if(number/j > 99) {
+            value=j;
+          }
+        }
+      }
+    }
+    return value;
+  }
+}
+//Great! now call factors on the array (largest to smalles) using a for loop.
+var value = 0;
+var factor1 = 0;
+var factor2 = 0;
+for(n=myPalindromeNumbers.length-1; value===0; n--) {
+  if (n === 0) {
+    value = "None found.";
+  };
+  var test = factors.largestThreeDigitFactor(myPalindromeNumbers[n]);
+  if (test) {
+    value = myPalindromeNumbers[n];
+    factor1 = test;
+    factor2 = myPalindromeNumbers[n]/test;
+  }
 }
